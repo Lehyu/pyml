@@ -32,3 +32,8 @@ class Plot(object):
         plt.xticks(rotation=90)
         plt.show()
 
+    def missing_info(self, data):
+        total = data.isnull().sum().sort_values(ascending=False)
+        percent = (data.isnull().sum() / data.isnull().count()).sort_values(ascending=False)
+        info = pd.concat([total, percent], axis=1, keys=['total', 'percent'])
+        return info

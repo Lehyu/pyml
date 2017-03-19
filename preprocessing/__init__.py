@@ -1,3 +1,3 @@
-from .imputation import Imputer
+from .Imputation import Imputer
 from .OneHotEncoder import OneHotEncoder
-from .analysis import Plot
+from .Analysis import Plot
