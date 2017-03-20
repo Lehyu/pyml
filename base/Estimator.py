@@ -4,7 +4,7 @@ class Estimator(object):
     def fit(self, X, y=None):
         raise NotImplementedError
 
-    def transform(self):
+    def transform(self, X, y=None):
         pass
 
     def predict(self, X):
