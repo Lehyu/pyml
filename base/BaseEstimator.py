@@ -1,5 +1,5 @@
 
-class Estimator(object):
+class BaseEstimator(object):
 
     def fit(self, X, y=None):
         raise NotImplementedError

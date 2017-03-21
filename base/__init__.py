@@ -1,1 +1,1 @@
-from . import Estimator
+from . import BaseEstimator

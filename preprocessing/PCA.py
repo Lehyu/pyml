@@ -1,11 +1,11 @@
 import numpy as np
 from scipy import linalg
 import scipy
-from base.Estimator import Estimator
+from base.BaseEstimator import BaseEstimator
 from sklearn.decomposition import PCA as skPCA
 
 
-class PCA(Estimator):
+class PCA(BaseEstimator):
     '''
     This method is just for study and understand how PCA works.
     '''

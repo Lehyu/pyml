@@ -1,11 +1,11 @@
 import numpy as np
 import random
 
-from base.Estimator import Estimator
-from tools.logger import logger
+from base.BaseEstimator import BaseEstimator
+from utils.logger import logger
 
 
-class SVC(Estimator):
+class SVC(BaseEstimator):
     def __init__(self, C=1, kernel='rbf', max_iter=10, tol=0.001, **kwargs):
         self.C = C
         self.kernel_type = kernel
