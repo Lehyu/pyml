@@ -1,6 +1,6 @@
 import numpy as np
 from collections import Counter
-
+import operator
 from utils import nutils
 
 Test = False
@@ -43,6 +43,8 @@ class InfoCriterion(object):
         values = np.unique(X)
         if len(values) == 0:
             return
+        if len(values) == 1:
+            return np.dot(1.0, self.info_y(y)), values[0]
         sorted(values)
         a = values[0]
         n_samples = len(X)
@@ -58,27 +60,12 @@ class InfoCriterion(object):
             info = np.dot(lpi, self.info_y(y[left]))+np.dot(rpi, self.info_y(y[right]))
             infos.append(info)
             splits.append(split)
+            a = b
         chosen_index = self.get_best_axis(infos)
         split = splits[chosen_index]
         info = infos[chosen_index]
         return info, split
 
-    def choose_best_feature(self, X, y, chosen_set):
-        n_samples, n_features = X.shape
-        unchosen_set = set(range(n_features)) - chosen_set
-        infos = []
-        values = []
-        types = []
-        for axis in unchosen_set:
-            discrete = True
-            for val in np.unique(X[:, axis]):
-                discrete &= nutils.is_int(val)
-            info, value = self.get_info(y, X[:, axis], discrete)
-            infos.append(info)
-            values.append(value)
-            types.append(discrete)
-        chosen_axis = self.get_best_axis(infos)
-        return chosen_axis, values[chosen_axis], types[chosen_axis]
 
     def get_info(self, y, X, discrete=True):
         pass
@@ -102,7 +89,11 @@ class Gini(InfoCriterion):
         return self.info(y, X, discrete)
 
     def get_best_axis(self, infos):
-        return np.asarray(infos).argmin()
+        if isinstance(infos, dict):
+            axis = min(infos.items(), key=operator.itemgetter(1))[0]
+            return axis
+        else:
+            return np.asarray(infos).argmin()
 
 
 class Gain(InfoCriterion):
@@ -122,7 +113,11 @@ class Gain(InfoCriterion):
         return self._info - enti
 
     def get_best_axis(self, infos):
-        return np.asarray(infos).argmax()
+        if isinstance(infos, dict):
+            axis = max(infos.items(), key=operator.itemgetter(1))[0]
+            return axis
+        else:
+            return np.asarray(infos).argmax()
 
 
 if __name__ == '__main__':
