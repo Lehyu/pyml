@@ -25,3 +25,6 @@ def accuracy(predict, y_val):
     for i in range(len(predict)):
         _score += 1 if predict[i] == y_val[i] else 0
     return float(_score) / len(predict)
+
+def metric(predict, y_val):
+    return np.sum(np.abs((predict-y_val)/(predict+y_val)))/len(predict)

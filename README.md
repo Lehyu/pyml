@@ -1,13 +1,17 @@
 # Classifier
 
-1. SVM
+## SVM
 
-2. DecisionTreeClassifier
+## DecisionTreeClassifier
+
+I haven't finished the pruning code yet.
 
 # Regressor
 
-1. DecisionTreeRegressor
+## DecisionTreeRegressor
+I haven't finished the pruning code yet.
 
 # Decomposition
 
-1.PCA
+## PCA
+This is a simplified pca code. It will be more complex if we consider all the situation.

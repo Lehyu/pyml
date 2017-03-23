@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # compare decision tree regressor
     mytree = cart.DecisionTreeRegressor(criterion='MSE')
     sktree = tree.DecisionTreeRegressor(criterion='mse')
-    sklutils.compare(sktree, mytree, datasets.load_diabetes(), score.mse)
+    sklutils.compare(sktree, mytree, datasets.load_diabetes(), score.metric)
 
 
 
