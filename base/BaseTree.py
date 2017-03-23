@@ -106,10 +106,8 @@ class BaseTree(BaseEstimator):
 
     # RecursionError: maximum recursion depth exceeded in comparison
     def _build_tree(self, X, y, unchosen_set):
-        if len(np.unique(y)) == 1:
+        if len(np.unique(y)) == 1 or len(unchosen_set) == 1:
             # mark this node as np.unique(y)
-            return self._build_leaf(y)
-        if len(unchosen_set) == 1:
             return self._build_leaf(y)
         chosen_axis, values, discrete = self._choose_best_feature(X, y, unchosen_set)
         subtrees = {}

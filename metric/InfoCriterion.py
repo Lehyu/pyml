@@ -1,6 +1,9 @@
 import numpy as np
 from collections import Counter
 import operator
+import sys
+
+from base.CART import SplitInfo
 from utils import nutils
 
 Test = False
@@ -26,18 +29,36 @@ class InfoCriterion(object):
         n_samples = len(y)
         return self.calc_info(y, n_samples, class_dict)
 
-    def info_discrete(self, y, X):
+
+    def info_discrete(self, y, X, values=None):
         n_samples = len(X)
         info = 0.0
-        for v in np.unique(X):
-            indices = np.nonzero((X == v))[0]
-            if len(indices) == 0:
-                continue
-            if Test:
-                print('v %d y %s' % (v, [v[0] for v in y[indices]]))
-            pi = len(indices) / float(n_samples)
-            info += np.dot(pi, self.info_y(y[indices]))
-        return info, np.unique(X)
+        if values is None:
+            values = np.unique(X)
+        values = list(values)
+        if isinstance(values[0], SplitInfo):
+            infos = []
+            for v in values:
+                mask = np.in1d(X, v.left)
+                left = np.nonzero(mask)[0]
+                right = np.nonzero(~mask)[0]
+                lpi = len(left)/float(n_samples)
+                rpi = len(right)/float(n_samples)
+                info = np.dot(lpi, self.info_y(y[left])) + np.dot(rpi, self.info_y(y[right]))
+                infos.append(info)
+            chosen_index = self.get_best_axis(infos)
+            return infos[chosen_index], values[chosen_index]
+
+        else:
+            for v in values:
+                indices = np.nonzero((X == v))[0]
+                if len(indices) == 0:
+                    continue
+                if Test:
+                    print('v %d y %s' % (v, [v[0] for v in y[indices]]))
+                pi = len(indices) / float(n_samples)
+                info += np.dot(pi, self.info_y(y[indices]))
+            return info, np.unique(X)
 
     def info_continuous(self, y, X):
         values = np.unique(X)
@@ -71,13 +92,20 @@ class InfoCriterion(object):
         pass
 
     def get_best_axis(self, infos):
-        pass
+        if isinstance(infos, dict):
+            axis = min(infos.items(), key=operator.itemgetter(1))[0]
+            return axis
+        else:
+            return np.asarray(infos).argmin()
 
     def update_y(self, y):
         self._info = self.info(y)
 
 
 class Gini(InfoCriterion):
+    def __init__(self):
+        self.worst = sys.maxsize
+
     def calc_info(self, y, n_samples, class_dict):
         gi = 1.0
         for key, val in class_dict.items():
@@ -88,15 +116,9 @@ class Gini(InfoCriterion):
     def get_info(self, y, X, discrete=True):
         return self.info(y, X, discrete)
 
-    def get_best_axis(self, infos):
-        if isinstance(infos, dict):
-            axis = min(infos.items(), key=operator.itemgetter(1))[0]
-            return axis
-        else:
-            return np.asarray(infos).argmin()
-
-
 class Gain(InfoCriterion):
+    def __init__(self):
+        self.worst = -10
 
     def calc_info(self, y, n_samples, class_dict):
         ent = 0.0
@@ -119,10 +141,17 @@ class Gain(InfoCriterion):
         else:
             return np.asarray(infos).argmax()
 
+class MSE(InfoCriterion):
+    def __init__(self):
+        self.worst = sys.maxsize
+
+    def calc_info(self, y, n_samples, class_dict):
+        return np.sqrt(np.sum(y**2)-n_samples*np.mean(y))
+
+
 
 if __name__ == '__main__':
     X = np.asarray([1,0,1,1,1,1,0,0,0])
-
     X = X.reshape((-1, 3))
     print(X)
     y = np.asarray([1,0,1])
