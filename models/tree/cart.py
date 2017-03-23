@@ -1,12 +1,8 @@
-from collections import Counter
-
-import numpy as np
 import itertools
 
-
-from base.BaseEstimator import BaseEstimator
-from base.SplitInfo import SplitInfo
-from metric.InfoCriterion import *
+from metric.info_criterion import *
+from models.base_estimator import BaseEstimator
+from models.tree.split_info import SplitInfo
 from utils import nutils
 from utils.logger import logger
 
@@ -131,8 +127,6 @@ class BaseTree(BaseEstimator):
                     p = p.left
         return p.feat_or_label
 
-    def score(self, predict, y_val):
-        pass
 
 class DecisionTreeClassifier(BaseTree):
 
@@ -140,20 +134,12 @@ class DecisionTreeClassifier(BaseTree):
         self.criterion = eval(criterion)()
         self.logger = logger('DecisionTreeClassifier')
 
-    def score(self, predict, y_val):
-        _score = 0.0
-        for i in range(len(predict)):
-            _score += 1 if predict[i] == y_val[i] else 0
-        return float(_score)/len(predict)
 
 class DecisionTreeRegressor(BaseTree):
     def __init__(self, criterion='MSE'):
         self.criterion = eval(criterion)()
         self.logger = logger('DecisionTreeRegressor')
 
-    def score(self, predict, y_val):
-        y_val = y_val.reshape(predict.shape)
-        return np.sqrt(np.sum((predict - y_val)**2))
 
 if __name__ == '__main__':
     tree = DecisionTreeClassifier()

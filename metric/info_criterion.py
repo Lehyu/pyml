@@ -1,10 +1,10 @@
-import numpy as np
-from collections import Counter
 import operator
 import sys
+from collections import Counter
 
-from base.CART import SplitInfo
-from utils import nutils
+import numpy as np
+
+from models.tree.split_info import SplitInfo
 
 Test = False
 

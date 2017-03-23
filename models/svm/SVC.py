@@ -1,7 +1,8 @@
-import numpy as np
 import random
 
-from base.BaseEstimator import BaseEstimator
+import numpy as np
+
+from models.base_estimator import BaseEstimator
 from utils.logger import logger
 
 

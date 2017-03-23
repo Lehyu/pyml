@@ -1,8 +1,13 @@
-# SVC
-Complete SVC
-# PCA
-This is a simplified PCA code which aim to understand how PCA works
+# Classifier
 
-# BaseTree
-Complete base tree which support discrete and continuous attributes
-todo: CART and RandomForest
+1. SVM
+
+2. DecisionTreeClassifier
+
+# Regressor
+
+1. DecisionTreeRegressor
+
+# Decomposition
+
+1.PCA
