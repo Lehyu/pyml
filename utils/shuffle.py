@@ -9,6 +9,7 @@ class ShuffleSpliter(object):
         :param test_size: int or float, if float it's the ratio of test samples.
         '''
         self.n_samples = n_samples
+
         if test_size < 0.0:
             raise ValueError("the parameter test_size(%.5f) must be int or float which is greater than 0"%test_size)
         if test_size < 1.0:

@@ -82,7 +82,10 @@ class InfoCriterion(object):
 
     def get_best_axis(self, infos):
         if isinstance(infos, dict):
-            axis = min(infos.items(), key=operator.itemgetter(1))[0]
+            if len(infos) == 0:
+                axis = None
+            else:
+                axis = min(infos.items(), key=operator.itemgetter(1))[0]
             return axis
         else:
             return np.asarray(infos).argmin()

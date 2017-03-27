@@ -7,6 +7,10 @@
 [2017.03.23] I haven't finished the pruning code yet.  
 [2017.03.24] Finished the pruning code, it seems works quiet well on iris data set(sklearn)
 
+## RandomForestClassifier
+
+[2017.03.27] Finished, it seems work well on iris data set while on digits is quiet bad. 
+
 # Regressor
 
 ## DecisionTreeRegressor

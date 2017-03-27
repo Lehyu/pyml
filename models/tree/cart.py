@@ -12,6 +12,7 @@ from utils.logger import logger
 from utils.shuffle import ShuffleSpliter
 from metric import metric as score
 
+#Test = True
 Test = False
 
 
@@ -52,17 +53,16 @@ class BaseTree(BaseEstimator):
     def fit(self, X, y=None):
         self.logger.check(X, y)
         self.n_features = X.shape[1]
-
+        '''
         if self.max_depth == None:
             self.max_depth = self.n_features
-
+        '''
         n_samples = X.shape[0]
         y = y.reshape((n_samples, -1))
         spliter = ShuffleSpliter(n_samples, test_size=self.test_size)
         train_ix, test_ix = spliter.shuffle()
         unchosen_set = set(range(self.n_features))
-        depth = 1
-        self.root = self._build_tree(X[train_ix, :], y[train_ix], unchosen_set, depth)
+        self.root = self._build_tree(X[train_ix, :], y[train_ix], unchosen_set, depth=1)
         self.root = self._prune_tree(X[test_ix, :], y[test_ix], self.root)
         return self
 
@@ -82,7 +82,8 @@ class BaseTree(BaseEstimator):
 
     def _build_tree(self, X, y, unchosen_set, depth):
         # pre-prune
-        if len(unchosen_set) <= self.min_samples_split or depth == self.max_depth - 1:
+        if len(X) < self.min_samples_leaf  or \
+                (self.max_depth is not None and depth == self.max_depth-1):# or len(X) < 2*self.min_samples_split:
             return self._build_leaf(y, depth)
         # if all samples have the same label, then mark it as leaf
         if len(np.unique(y)) == 1:
@@ -90,6 +91,8 @@ class BaseTree(BaseEstimator):
 
         # choose split point
         chosen_axis, split = self._choose_best_features(X, y, unchosen_set)
+        if chosen_axis is None:
+            return self._build_leaf(y, depth)
         if Test:
             print('chosen_axis %d, split %s' % (chosen_axis, split))
         # discrete or continuous
@@ -97,14 +100,15 @@ class BaseTree(BaseEstimator):
             mask = np.in1d(X[:, chosen_axis], split.left)
         else:
             mask = X[:, chosen_axis] < split
-
+        '''
         if len(X[mask, :]) == 0:
             left = self._build_leaf(y, depth + 1)
+        '''
+        if len(unchosen_set-{chosen_axis}) == 0:
+            left = self._build_leaf(y[mask], depth)
+            right = self._build_leaf(y[~mask], depth)
         else:
             left = self._build_tree(X[mask, :], y[mask, :], unchosen_set - {chosen_axis}, depth + 1)
-        if len(X[~mask, :]) == 0:
-            right = self._build_leaf(y, depth + 1)
-        else:
             right = self._build_tree(X[~mask, :], y[~mask, :], unchosen_set - {chosen_axis}, depth + 1)
         root = TreeNode(chosen_axis, depth, Counter([v[0] for v in y]), left, right, split)
         return root
@@ -124,7 +128,7 @@ class BaseTree(BaseEstimator):
             score_after_prue = self._score(self.predict(X), y)
             if not self._compare(score_before_prune, score_after_prue):
                 node.left = left
-            else:
+            elif Test:
                 print('improve from %.5f to %.5f' % (score_before_prune, score_after_prue))
 
             # prune right
@@ -135,7 +139,7 @@ class BaseTree(BaseEstimator):
             score_after_prue = self._score(self.predict(X), y)
             if not self._compare(score_before_prune, score_after_prue):
                 node.right = right
-            else:
+            elif Test:
                 print('improve from %.5f to %.5f' % (score_before_prune, score_after_prue))
         return node
 
@@ -153,17 +157,32 @@ class BaseTree(BaseEstimator):
             if discrete:
                 if len(np.unique(X[:, axis])) != 1:
                     splitinfos = self.generate_combs(set(np.unique(X[:, axis])))
-                    info, splitinfo = self.criterion.info_discrete(y, X[:, axis], splitinfos)
+                    '''
+                    for splitinfo in list(splitinfos):
+                        mask = np.in1d(X[:, axis], splitinfo.left)
+                        if len(X[mask]) < self.min_samples_split or len(X[~mask]) < self.min_samples_split:
+                            splitinfos.remove(splitinfo)
+                    if len(splitinfos) == 0:
+                        continue
+                    '''
+                    info, splitinfo = self.criterion.info_discrete(y, X[:, axis], list(splitinfos))
                 else:
-                    info, splitinfo = self.criterion.worst, self.criterion.worst
-
+                    continue
+                    #info = self.criterion.info_y(y)
+                    #splitinfo = self.criterion.worst
             else:
+
                 info, splitinfo = self.criterion.info_continuous(y, X[:, axis])
+
             infos[axis] = info
             splits[axis] = splitinfo
             # types.append(discrete)
+        if Test:
+            print("unchosen set %s infos %s"%(unchosen_set, infos))
         chosen_axis = self.criterion.get_best_axis(infos)
-        return chosen_axis, splits[chosen_axis]
+        if chosen_axis is not None:
+            split = splits[chosen_axis]
+        return chosen_axis, split
 
     def generate_combs(self, values):
         n_class = len(values)
