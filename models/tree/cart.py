@@ -67,8 +67,7 @@ class BaseTree(BaseEstimator):
         return self
 
     def predict(self, X):
-        if self.root is None:
-            raise ValueError("Please train the model first!")
+        assert self.root is not None, "Please train the model first!"
         pred = []
         X = X.reshape((-1, self.n_features))
         for x in X:
@@ -180,6 +179,7 @@ class BaseTree(BaseEstimator):
         if Test:
             print("unchosen set %s infos %s"%(unchosen_set, infos))
         chosen_axis = self.criterion.get_best_axis(infos)
+        split = None
         if chosen_axis is not None:
             split = splits[chosen_axis]
         return chosen_axis, split

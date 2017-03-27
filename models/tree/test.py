@@ -26,7 +26,7 @@ if __name__ == '__main__':
     #'''
 
 
-    #'''
+    '''
     for i in range(10):
         RF = RandomForestClassifier(max_features="log2", min_samples_splits=10)
         skrf = SKLRF(max_features="log2")

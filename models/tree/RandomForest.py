@@ -104,8 +104,7 @@ class RandomForestClassifier(BaseEstimator):
 
 
     def predict(self, X):
-        if not self.train:
-            raise ChildProcessError("fitting isn't done!")
+        assert self.train, "fitting isn't done!"
         predicts = []
         for x in X:
             predicts.append(self._predict(x))
