@@ -1,6 +1,9 @@
 import random
 import numpy as np
 
+from utils import nutils
+
+
 class ShuffleSpliter(object):
 
     def __init__(self, n_samples, test_size=0.2):
@@ -22,12 +25,7 @@ class ShuffleSpliter(object):
         '''
         :return: train indexes and test indexes
         '''
-        indexes = list(range(self.n_samples))
-        res = []
-        while indexes:
-            ix = random.randrange(0, len(indexes))
-            res.append(indexes[ix])
-            indexes.pop(ix)
+        res = nutils.shuffle(self.n_samples)
         test_ix = res[:self.test_size]
         train_ix = res[self.test_size:]
         return train_ix, test_ix

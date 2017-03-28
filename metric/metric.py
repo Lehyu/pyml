@@ -15,7 +15,6 @@ def F1(Precision, Recall):
     else:
         raise ValueError("Precision's type is %s while recall's type is %s"%(type(Precision), type(Recall)))
 
-
 def mse(predict, y_val):
     y_val = y_val.reshape(predict.shape)
     return np.sqrt(np.sum((predict - y_val) ** 2))

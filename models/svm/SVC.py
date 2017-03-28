@@ -3,31 +3,32 @@ import random
 import numpy as np
 
 from models.base_estimator import BaseEstimator
+from preprocessing.kernel import RBFKernel, PolyKernel, LinearKernel
 from utils.logger import logger
 
-
+KERNEL = {'rbf': RBFKernel,
+          'poly': PolyKernel,
+          'linear': LinearKernel
+          }
+DEFAULT_KERNEL = 'rbf'
+Test = False
 class SVC(BaseEstimator):
     def __init__(self, C=1, kernel='rbf', max_iter=10, tol=0.001, **kwargs):
         self.C = C
-        self.kernel_type = kernel
         self.max_iter = max_iter
         self.tol = tol
         self.is_trained = False
-        if self.kernel_type == 'rbf':
-            if 'sigma' in kwargs:
-                self.simga = kwargs['sigma']
-            else:
-                self.simga = 0.5
-        elif self.kernel_type == 'poly':
-            if 'degree' in kwargs:
-                self.degree = kwargs['degree']
-            else:
-                self.degree = 3
-        elif self.kernel_type == 'linear':
-            if 'constant' in kwargs:
-                self.constant = kwargs['constant']
-            else:
-                self.constant = 3
+        kernel_param = None
+        if kernel == 'rbf':
+            kernel_param = kwargs['sigma'] if 'sigma' in kwargs else 0.5
+        elif kernel == 'poly':
+            kernel_param = kwargs['degree'] if 'degree' in kwargs else 3
+        elif kernel == 'linear':
+            kernel_param = kwargs['constant'] if 'constant' in kwargs else 3
+        else:
+            raise NameError('Check if the kernel splled right or not! '
+                            'If it\'s right, then %s has been\'t supported yet!')
+        self.kernel = KERNEL[kernel](kernel_param)
         self.logger = logger('SVC')
 
     def fit(self, X, y=None):
@@ -40,9 +41,7 @@ class SVC(BaseEstimator):
         self.alphas = np.zeros((n_size, 1), dtype=np.float64)
         self.ecache = np.zeros((n_size, 1), dtype=np.float64)
         self.b = np.zeros(1)
-        K = np.zeros((n_size, n_size), dtype=np.float64)
-        for ix in range(n_size):
-            K[ix, :] = self._kernel_transform(X, X[ix])
+        K = self.kernel.transform(X)
         for ix in range(n_size):
             self._update_e(K, y, ix)
         self._platt_smo(K, y)
@@ -59,33 +58,12 @@ class SVC(BaseEstimator):
             raise IndexError("X index is (-1,%d) while it prefer (-1,%d)"%(n_features, self.n_features))
         pred = []
         for ix in range(n_size):
-            p = np.dot(self._kernel_transform(self.sv, X[ix]), self.alphas*self.y)+self.b
+            p = np.dot(self.kernel._kernel_transform(self.sv, X[ix]), self.alphas*self.y)+self.b
             pred.append(np.sign(p))
         pred = np.asarray([1 if p == 1 else 0 for p in pred])
         pred = pred.reshape((-1,1))
         return pred
 
-    def _kernel_transform(self, X, x):
-        '''
-        :param X: (n_samples, n_features)
-        :param x: (1, n_features)
-        :return:  (1, n_samples)
-        '''
-        if self.kernel_type == 'rbf':
-            n_size = X.shape[0]
-            k = np.zeros((1, n_size))
-            for ix in range(n_size):
-                delta = X[ix] - x
-                k[:,ix] = np.dot(delta, delta)
-            k = np.exp(k/(-2.0*self.simga**2))
-            return k
-        elif self.kernel_type == 'poly':
-            return (np.dot(X, x)+1)**self.degree
-        elif self.kernel_type == 'linear':
-            return np.dot(X, x)+self.constant
-        else:
-            raise NameError('Check if the kernel splled right or not! '
-                            'If it\'s right, then %s has been\'t supported yet!')
 
     def _preprocess_y(self, y):
         n_class = len(np.unique(y))
@@ -110,8 +88,10 @@ class SVC(BaseEstimator):
 
                 for ix in non_bound_set:
                     alpha_changed += self._examine_at(K, y, ix)
-            print('iteration %d examine at %s : %d alpha pair change!' % (
-            iter_count,  'entire set' if entire_set else 'non bound set', alpha_changed))
+            if Test:
+                format ='iteration %d examine at %s : %d alpha pair change!'
+                format = format%(iter_count,  'entire set' if entire_set else 'non bound set', alpha_changed)
+                print(format)
             if entire_set:
                 entire_set = False
             elif alpha_changed == 0:

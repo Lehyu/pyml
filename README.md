@@ -1,3 +1,5 @@
+Try to implement algorithms of machine learning which I known and used. These implementation refer to **sklearn**.
+
 # Classifier
 
 ## SVM
@@ -17,6 +19,16 @@
 ## DecisionTreeRegressor
 [2017.03.23] I haven't finished the pruning code yet.  
 [2017.03.24] Finished the pruning code. but it seems quiet sucks on diabetes data set(sklearn). Maybe some part went wrong, still haven't no idea
+
+## LinearRegression
+
+[2017.03.28] Finished LR, it has comparable result on diabetes data set with LR in sklearn.
+
+# Optimizer
+
+## Stochastic Gradient Descent
+
+[2017.03.28] Finished SGD for LR, there are maybe some bug when apply other learner. Remain to test. 
 
 # Decomposition
 

@@ -2,6 +2,7 @@
 handle number
 '''
 import numpy as np
+import random
 
 def is_int(num):
     if num < 0:
@@ -23,3 +24,21 @@ def check_discrete(values):
             break
     return discrete
 
+def shuffle(n_samples):
+    indexes = list(range(n_samples))
+    res = []
+    while indexes:
+        ix = random.randrange(0, len(indexes))
+        res.append(indexes[ix])
+        indexes.pop(ix)
+    return res
+
+def batch(n_samples, batch_size):
+    res = shuffle(n_samples)
+    iters = int(np.ceil(n_samples/batch_size))
+    for iter in range(iters):
+        start = iter*batch_size
+        if iter == iters-1:
+            yield res[start:]
+        else:
+            yield res[start: start+batch_size]
