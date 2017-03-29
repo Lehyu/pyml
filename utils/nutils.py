@@ -42,3 +42,13 @@ def batch(n_samples, batch_size):
             yield res[start:]
         else:
             yield res[start: start+batch_size]
+
+def clip_by_value(value, v_min, v_max):
+    return value.clip(v_min, v_max)
+
+def sigmoid(a):
+    return 1 / (1 + np.exp(-a))
+
+def sofmax(a):
+    tmp = np.exp(a)
+    return tmp / np.sum(tmp, axis=1).reshape((-1,1))

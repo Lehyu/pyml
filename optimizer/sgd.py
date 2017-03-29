@@ -2,10 +2,12 @@ import numpy as np
 import sys
 
 from optimizer.base_optimizer import BaseOptimizer
-from optimizer.loss import LossWithSumOfSquare
+from optimizer.loss import LossWithSumOfSquare, LossWithLogits, LossWithSoftmax
 from utils import nutils
 
-LOSS = {'SumOfSquares': LossWithSumOfSquare}
+LOSS = {'SumOfSquares': LossWithSumOfSquare,
+        'LossWithLogits':LossWithLogits,
+        'LossWithSoftmax':LossWithSoftmax}
 Test = False
 
 class Sgd(BaseOptimizer):
