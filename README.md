@@ -11,7 +11,7 @@ Try to implement algorithms of machine learning which I known and used. These im
 [2017.03.27] Found a new issue of **min_samples_split** when I wrote the RandomForestClassifier code. I didn't handle this parameter for now.
 
 ## LogisticRegression
-[2017.03.29] Finished. support multi-class, I haven't test binary classification yet, there are maybe some bug. 
+[2017.03.29] Finished. support multi-class and of course binary classification. 
 
 ## RandomForestClassifier
 
