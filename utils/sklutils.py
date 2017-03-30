@@ -21,5 +21,4 @@ def compare(skmodel, mymodel, data, score,test_size=0.2, random_state=0, ohe=Fal
     print('my model %.5f'%(score(mymodel.predict(X_val), y_val)))
     print('mymodel ',[v for v in mymodel.predict(X_val).astype(int)])
     print('y_val   ', [v for v in y_val.astype(int)])
-
     print('skmodel ', [v for v in skmodel.predict(X_val).astype(int)])

@@ -27,3 +27,19 @@ def accuracy(predict, y_val):
 
 def metric(predict, y_val):
     return np.sum(np.abs((predict-y_val)/(predict+y_val)))/len(predict)
+
+# TianChi KDD task 2 evaluation metric
+def MAPE(predict, y_val):
+    if len(y_val.shape) == 2:
+        mape = 0.0
+        _len = 0
+        for axis in range(y_val.shape[1]):
+            mask = np.nonzero(y_val[:, axis] != 0)[0]
+            res = np.abs(predict[mask,axis]-y_val[mask,axis])
+            mape += np.sum(res/y_val[mask, axis])
+            _len += len(y_val[mask])
+        return mape/float(_len)
+    else:
+        mask = np.nonzero(y_val != 0)[0]
+        res = np.abs(predict[mask]-y_val[mask])
+        return np.sum(res/y_val[mask])/len(predict[mask])
