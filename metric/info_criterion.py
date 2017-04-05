@@ -4,8 +4,10 @@ from collections import Counter
 
 import numpy as np
 
+from metric.score import MAPE
 from models.tree.split_info import SplitInfo
 from utils import nutils
+
 
 
 class InfoCriterion(object):
@@ -16,7 +18,10 @@ class InfoCriterion(object):
         raise NotImplementedError
 
     def info_y(self, y):
-        class_dict = dict(Counter([v[0] for v in y]))
+        if len(y.shape) == 2:
+            class_dict = dict(Counter([v[0] for v in y]))
+        else:
+            class_dict = dict(Counter([v for v in y]))
         n_samples = len(y)
         return self.calc_info(y, n_samples, class_dict)
 
@@ -35,7 +40,7 @@ class InfoCriterion(object):
             right = np.nonzero(~mask)[0]
             lpi = len(left) / float(n_samples)
             rpi = len(right) / float(n_samples)
-            info = np.dot(lpi, self.info_y(y[left])) + np.dot(rpi, self.info_y(y[right]))
+            info = lpi*self.info_y(y[left])+ rpi*self.info_y(y[right])
             infos.append(info)
         chosen_index = self.get_best_axis(infos)
         return infos[chosen_index], values[chosen_index]
@@ -131,4 +136,14 @@ class mse(InfoCriterion):
     def calc_info(self, y, n_samples, class_dict):
         info = np.sum((y-np.mean(y))**2)
         return info
+
+class mape(InfoCriterion):
+    def __init__(self):
+        self.worst = sys.maxsize
+
+    def calc_info(self, y, n_samples, class_dict):
+        y_mean = np.mean(y, axis=0)
+        info =  MAPE(y, y_mean)
+        return info
+
 

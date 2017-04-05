@@ -8,10 +8,10 @@ from sklearn import tree
 import sklearn
 from models.tree.RandomForest import RandomForestClassifier
 from utils import sklutils
-from metric import metric as score
+from metric import score as score
 
 if __name__ == '__main__':
-    #'''
+    '''
     # compare decision tree classifier
     mytree = cart.DecisionTreeClassifier(criterion='gini')
     sktree = tree.DecisionTreeClassifier(criterion='gini')
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     #'''
 
 
-    '''
+    #'''
     for i in range(10):
         RF = RandomForestClassifier(max_features="log2", min_samples_splits=10)
         skrf = SKLRF(max_features="log2")

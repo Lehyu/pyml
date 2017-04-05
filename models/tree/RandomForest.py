@@ -5,15 +5,16 @@ import numpy as np
 import queue
 
 from models.base_estimator import BaseEstimator
-from models.tree.cart import DecisionTreeClassifier
+from models.tree.cart import DecisionTreeClassifier, DecisionTreeRegressor
 from preprocessing.sampling import BootStrap
 from utils.logger import logger
 from utils.shuffle import ShuffleSpliter
 
 Test = False
 
-class RandomForestClassifier(BaseEstimator):
-    def __init__(self, n_estimators=10, min_samples_splits=2, min_samples_leaf=1, max_depth=None, n_jobs=1, max_features=None):
+class BaseForest(BaseEstimator):
+    def __init__(self, criterion='gini', n_estimators=10, min_samples_splits=2, min_samples_leaf=1, max_depth=None, n_jobs=1,
+                 max_features=None):
         '''
         :param n_estimators: the number of estimators
         :param min_samples_splits:
@@ -22,6 +23,7 @@ class RandomForestClassifier(BaseEstimator):
         :param n_jobs:
         :param max_features: int/float/str, "log2","auto","sqrt"
         '''
+        self.criterion = criterion
         self.n_estimators = n_estimators
         self.max_depth = max_depth
         self.min_samples_split = min_samples_splits
@@ -33,18 +35,17 @@ class RandomForestClassifier(BaseEstimator):
         self.customer_index = 0
         self.sample_queue = queue.Queue(maxsize=self.n_estimators)
         self.estimators = list()
-        self.logger = logger("RandomForestClassifier")
         if self.n_jobs == -1:
             self.n_jobs = 10
 
     def _producer(self, n_samples, n_features):
         while self.producer_index < self.n_estimators:
             train_slice = self.bootstrap.sampling()
-            val_slice = list(set(range(n_samples))-set(train_slice))
+            val_slice = list(set(range(n_samples)) - set(train_slice))
             spliter = ShuffleSpliter(n_samples=n_features, test_size=self.max_features)
             _, features = spliter.shuffle()
-            print(features)
             if Test:
+                print(features)
                 print('train_slice %s' % train_slice)
                 print('val_slice %s' % val_slice)
                 print('features %s' % features)
@@ -56,13 +57,17 @@ class RandomForestClassifier(BaseEstimator):
             if self.sample_queue.empty():
                 continue
             train_slice, val_slice, features = self.sample_queue.get()
-            base_classifier = DecisionTreeClassifier(max_depth=self.max_depth, min_samples_leaf=self.min_samples_leaf,
-                                                     min_samples_split=self.min_samples_split)
+            base_model = self.base_model(criterion=self.criterion, max_depth=self.max_depth,
+                                                    min_samples_leaf=self.min_samples_leaf,
+                                                    min_samples_split=self.min_samples_split)
+            '''
             unchosen_set = set(features)
             base_classifier.n_features = X.shape[1]
             base_classifier.root = base_classifier._build_tree(X[train_slice, :], y[train_slice], unchosen_set, depth=1)
             base_classifier.root = base_classifier._prune_tree(X[val_slice, :], y[val_slice], base_classifier.root)
-            self.estimators.append(base_classifier)
+            '''
+            base_model.fit(X[train_slice, :], y[train_slice], train_slice, val_slice)
+            self.estimators.append(base_model)
             self.customer_index += 1
 
     def _check_max_features(self):
@@ -76,7 +81,7 @@ class RandomForestClassifier(BaseEstimator):
             else:
                 raise ValueError("For now only support sqrt/log2/auto! Please check out!")
         elif isinstance(self.max_features, float):
-            self.max_features = int(self.max_features*self.n_features)
+            self.max_features = int(self.max_features * self.n_features)
 
     def fit(self, X, y=None):
         self.logger.check(X, y)
@@ -87,8 +92,8 @@ class RandomForestClassifier(BaseEstimator):
         self._check_max_features()
 
         self.bootstrap = BootStrap(n_samples)
-        y = y.reshape((-1,1))
-        t_producer = Thread(target=self._producer,args=(n_samples, n_features))
+        y = y.reshape((-1, 1))
+        t_producer = Thread(target=self._producer, args=(n_samples, n_features))
         t_producer.daemon = True
         t_producer.start()
         threads = []
@@ -102,7 +107,6 @@ class RandomForestClassifier(BaseEstimator):
             t.join()
         self.train = True
 
-
     def predict(self, X):
         assert self.train, "fitting isn't done!"
         predicts = []
@@ -110,12 +114,23 @@ class RandomForestClassifier(BaseEstimator):
             predicts.append(self._predict(x))
         predicts = np.asarray(predicts)
         return predicts
+
     def _predict(self, x):
         predicts = []
         for estimator in self.estimators:
             predicts.append(estimator._predict(x))
-        counts = Counter(predicts)
-        return max(counts.items(), key=lambda item:item[1])[0]
+        return np.mean(np.asarray(predicts))
+class RandomForestRegressor(BaseForest):
+    def __init__(self, criterion='gini', n_estimators=10, min_samples_splits=2, min_samples_leaf=1, max_depth=None,
+                 n_jobs=1, max_features=None):
+        super().__init__(criterion, n_estimators, min_samples_splits, min_samples_leaf, max_depth, n_jobs, max_features)
+        self.logger = logger("RandomForestRegressor")
+        self.base_model = DecisionTreeRegressor
 
 
-
+class RandomForestClassifier(BaseForest):
+    def __init__(self, criterion='gini', n_estimators=10, min_samples_splits=2, min_samples_leaf=1, max_depth=None,
+                 n_jobs=1, max_features=None):
+        super().__init__(criterion, n_estimators, min_samples_splits, min_samples_leaf, max_depth, n_jobs, max_features)
+        self.logger = logger("RandomForestClassifier")
+        self.base_model = DecisionTreeClassifier

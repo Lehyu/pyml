@@ -54,7 +54,7 @@ if __name__ == "__main__":
     from sklearn.linear_model import LogisticRegression as SKLGR
     from sklearn.model_selection import train_test_split
     from utils import sklutils
-    from metric import metric as score
+    from metric import score as score
     '''
     mylr = LinearRegression()
     sklr = SKLR()

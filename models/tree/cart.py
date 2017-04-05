@@ -1,16 +1,15 @@
 import itertools
-import queue
 from collections import Counter
 import operator
 import numpy as np
 
-from metric.info_criterion import gini, gain, mse
+from metric.info_criterion import gini, mape, mse
 from models.base_estimator import BaseEstimator
 from models.tree.split_info import SplitInfo
 from utils import nutils
 from utils.logger import logger
 from utils.shuffle import ShuffleSpliter
-from metric import metric as score
+from metric import score
 
 #Test = True
 Test = False
@@ -49,8 +48,9 @@ class BaseTree(BaseEstimator):
         self.test_size = test_size
         self.logger = None
         self.root = None
+        self.discrete = []
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None, train_ix=None, test_ix=None):
         self.logger.check(X, y)
         self.n_features = X.shape[1]
         '''
@@ -58,10 +58,14 @@ class BaseTree(BaseEstimator):
             self.max_depth = self.n_features
         '''
         n_samples = X.shape[0]
-        y = y.reshape((n_samples, -1))
+        y = y.reshape((n_samples, ))
         spliter = ShuffleSpliter(n_samples, test_size=self.test_size)
-        train_ix, test_ix = spliter.shuffle()
+        if train_ix is None:
+            train_ix, test_ix = spliter.shuffle()
         unchosen_set = set(range(self.n_features))
+        for axis in unchosen_set:
+            discrete = nutils.check_discrete(np.unique(X[:, axis]))
+            self.discrete.append(discrete)
         self.root = self._build_tree(X[train_ix, :], y[train_ix], unchosen_set, depth=1)
         self.root = self._prune_tree(X[test_ix, :], y[test_ix], self.root)
         return self
@@ -73,20 +77,22 @@ class BaseTree(BaseEstimator):
         for x in X:
             pred.append(self._predict(x))
         pred = np.asarray(pred)
-        pred = pred.reshape((-1, 1))
+        pred = pred.reshape((-1,))
         return pred
 
     def _predict(self, X):
         pass
 
     def _build_tree(self, X, y, unchosen_set, depth):
-        # pre-prune
-        if len(X) < self.min_samples_leaf  or \
-                (self.max_depth is not None and depth == self.max_depth-1):# or len(X) < 2*self.min_samples_split:
-            return self._build_leaf(y, depth)
         # if all samples have the same label, then mark it as leaf
         if len(np.unique(y)) == 1:
             return self._build_leaf(y, depth)
+
+        # pre-prune
+        if 0< len(y) < self.min_samples_leaf  or \
+                (self.max_depth is not None and depth == self.max_depth-1):# or len(X) < 2*self.min_samples_split:
+            return self._build_leaf(y, depth)
+
 
         # choose split point
         chosen_axis, split = self._choose_best_features(X, y, unchosen_set)
@@ -103,43 +109,52 @@ class BaseTree(BaseEstimator):
         if len(X[mask, :]) == 0:
             left = self._build_leaf(y, depth + 1)
         '''
-        if len(unchosen_set-{chosen_axis}) == 0:
-            left = self._build_leaf(y[mask], depth)
-            right = self._build_leaf(y[~mask], depth)
+        if len(unchosen_set-{chosen_axis}) == 0 or len(X[mask,:]) == 0 or len(X[~mask, :]) == 0:
+            left = self._build_leaf(y[mask], depth) if len(X[mask, :]) != 0 else None
+            right = self._build_leaf(y[~mask], depth) if len(X[~mask, :]) != 0 else None
         else:
-            left = self._build_tree(X[mask, :], y[mask, :], unchosen_set - {chosen_axis}, depth + 1)
-            right = self._build_tree(X[~mask, :], y[~mask, :], unchosen_set - {chosen_axis}, depth + 1)
-        root = TreeNode(chosen_axis, depth, Counter([v[0] for v in y]), left, right, split)
+            left = self._build_tree(X[mask, :], y[mask], unchosen_set - {chosen_axis}, depth + 1)
+            right = self._build_tree(X[~mask, :], y[~mask], unchosen_set - {chosen_axis}, depth + 1)
+        root = TreeNode(chosen_axis, depth, self._counter(y), left, right, split)
         return root
 
     def _build_leaf(self, y, depth):
-        y_counts = Counter([v[0] for v in y])
+        y_counts = self._counter(y)
         label = self._get_label(y_counts)
         return TreeNode(label, depth, y_counts)
+
+    def _counter(self, y):
+        if len(y.shape) == 2:
+            y_counts = Counter([v[0] for v in y])
+        else:
+            y_counts = Counter([v for v in y])
+        return y_counts
 
     def _prune_tree(self, X, y, node):
         if not node.leaf:
             # prune left
-            left = node.left
-            self._prune_tree(X, y, left)
-            score_before_prune = self._score(self.predict(X), y)
-            node.left = self._branch2leaf(left)
-            score_after_prue = self._score(self.predict(X), y)
-            if not self._compare(score_before_prune, score_after_prue):
-                node.left = left
-            elif Test:
-                print('improve from %.5f to %.5f' % (score_before_prune, score_after_prue))
+            if node.left is not None:
+                left = node.left
+                self._prune_tree(X, y, left)
+                score_before_prune = self._score(y, self.predict(X))
+                node.left = self._branch2leaf(left)
+                score_after_prue = self._score(y, self.predict(X))
+                if not self._compare(score_before_prune, score_after_prue):
+                    node.left = left
 
+                elif Test:
+                    print('improve from %.5f to %.5f' % (score_before_prune, score_after_prue))
             # prune right
-            right = node.right
-            self._prune_tree(X, y, right)
-            score_before_prune = self._score(self.predict(X), y)
-            node.right = self._branch2leaf(right)
-            score_after_prue = self._score(self.predict(X), y)
-            if not self._compare(score_before_prune, score_after_prue):
-                node.right = right
-            elif Test:
-                print('improve from %.5f to %.5f' % (score_before_prune, score_after_prue))
+            if node.right is not None:
+                right = node.right
+                self._prune_tree(X, y, right)
+                score_before_prune = self._score(y, self.predict(X))
+                node.right = self._branch2leaf(right)
+                score_after_prue = self._score(y, self.predict(X))
+                if not self._compare(score_before_prune, score_after_prue):
+                    node.right = right
+                elif Test:
+                    print('improve from %.5f to %.5f' % (score_before_prune, score_after_prue))
         return node
 
     def _branch2leaf(self, node):
@@ -152,9 +167,8 @@ class BaseTree(BaseEstimator):
         if Test:
             print('unchosen %d' % len(unchosen_set))
         for axis in unchosen_set:
-            discrete = nutils.check_discrete(np.unique(X[:, axis]))
-            if discrete:
-                if len(np.unique(X[:, axis])) != 1:
+            if self.discrete[axis]:
+                if len(np.unique(X[:, axis])) > 1:
                     splitinfos = self.generate_combs(set(np.unique(X[:, axis])))
                     '''
                     for splitinfo in list(splitinfos):
@@ -170,7 +184,6 @@ class BaseTree(BaseEstimator):
                     #info = self.criterion.info_y(y)
                     #splitinfo = self.criterion.worst
             else:
-
                 info, splitinfo = self.criterion.info_continuous(y, X[:, axis])
 
             infos[axis] = info
@@ -205,8 +218,12 @@ class BaseTree(BaseEstimator):
             # print('feat/label %d x value %.5f split %.5f' % (p.feat_or_label, x[p.feat_or_label], p.split))
             if (isinstance(p.split, SplitInfo) and (x[p.feat_or_label] in p.split.left)) \
                     or (not isinstance(p.split, SplitInfo) and x[p.feat_or_label] < p.split):
+                if p.left is None:
+                    return self._get_label(p.memory)
                 p = p.left
             else:
+                if p.right is None:
+                    return self._get_label(p.memory)
                 p = p.right
         # print('predict %.5f'%p.feat_or_label)
         return p.feat_or_label
@@ -230,8 +247,8 @@ class DecisionTreeClassifier(BaseTree):
         label = max(y_counts.items(), key=operator.itemgetter(1))[0]
         return label
 
-    def _score(self, predict, y_val):
-        return score.accuracy(predict, y_val)
+    def _score(self, y, y_pred):
+        return score.accuracy(y, y_pred)
 
     def _compare(self, score_before_prune, score_after_prue):
         return score_before_prune < score_after_prue
@@ -250,8 +267,8 @@ class DecisionTreeRegressor(BaseTree):
             number += num
         return total / float(number)
 
-    def _score(self, predict, y_val):
-        return score.metric(predict, y_val)
+    def _score(self, y, y_pred):
+        return score.MAPE(y, y_pred)
 
     def _compare(self, score_before_prune, score_after_prue):
         return score_before_prune > score_after_prue

@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from models.svm import SVC
 from sklearn import svm
 from utils import sklutils
-from metric import metric as score
+from metric import score as score
 
 if __name__ == '__main__':
     mysvc = SVC(C=1, kernel='rbf', max_iter=1, tol=0.001, sigma=0.5)
