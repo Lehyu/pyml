@@ -4,10 +4,10 @@ from scipy import sparse
 
 
 class OneHotEncoder(object):
-    '''
+    """
     categorical_features: "all" or array
     ------------------------------------------
-    '''
+    """
     def __init__(self,categorical_features="all"):
         self.categorical_features = categorical_features
         self.enc = encoder()

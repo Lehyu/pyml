@@ -3,10 +3,10 @@ from utils.logger import logger
 
 
 class MinMaxScaler(BasePreprocessor):
-    '''
+    """
     X_std = (X-X_min)/(X_max-X_min)
     X_scaled = X_std*(up_bound - low_bound)+low_bound
-    '''
+    """
     def __init__(self, feature_range=(0,1)):
         self.logger = logger("MinMaxScaler")
         self.lb = feature_range[0]

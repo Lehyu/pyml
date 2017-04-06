@@ -4,10 +4,9 @@ from collections import Counter
 
 import numpy as np
 
-from metric.score import MAPE
-from models.tree.split_info import SplitInfo
+from metric import MAPE
+from models.tree import SplitInfo
 from utils import nutils
-
 
 
 class InfoCriterion(object):
@@ -40,7 +39,7 @@ class InfoCriterion(object):
             right = np.nonzero(~mask)[0]
             lpi = len(left) / float(n_samples)
             rpi = len(right) / float(n_samples)
-            info = lpi*self.info_y(y[left])+ rpi*self.info_y(y[right])
+            info = lpi * self.info_y(y[left]) + rpi * self.info_y(y[right])
             infos.append(info)
         chosen_index = self.get_best_axis(infos)
         return infos[chosen_index], values[chosen_index]
@@ -98,6 +97,7 @@ class InfoCriterion(object):
     def update_y(self, y):
         self._info = self.info_y(y)
 
+
 class gini(InfoCriterion):
     def __init__(self):
         self.worst = sys.maxsize
@@ -134,8 +134,9 @@ class mse(InfoCriterion):
         self.worst = sys.maxsize
 
     def calc_info(self, y, n_samples, class_dict):
-        info = np.sum((y-np.mean(y))**2)
+        info = np.sum((y - np.mean(y)) ** 2)
         return info
+
 
 class mape(InfoCriterion):
     def __init__(self):
@@ -143,7 +144,5 @@ class mape(InfoCriterion):
 
     def calc_info(self, y, n_samples, class_dict):
         y_mean = np.mean(y, axis=0)
-        info =  MAPE(y, y_mean)
+        info = MAPE(y, y_mean)
         return info
-
-

@@ -4,11 +4,11 @@ import operator
 import numpy as np
 
 from metric.info_criterion import gini, mape, mse
-from models.base_estimator import BaseEstimator
-from models.tree.split_info import SplitInfo
+from models import BaseEstimator
+from models.tree import SplitInfo
 from utils import nutils
-from utils.logger import logger
-from utils.shuffle import ShuffleSpliter
+from utils import logger
+from utils import ShuffleSpliter
 from metric import score
 
 #Test = True
@@ -34,13 +34,13 @@ class TreeNode(object):
 
 class BaseTree(BaseEstimator):
     def __init__(self, criterion='gini', max_depth=None, test_size=0.2, min_samples_split=2, min_samples_leaf=2):
-        '''
+        """
         :param criterion: string, gini, entropy, mse(default='gini')
         :param max_depth:  int or None, the maximum of the tree
         :param test_size:  int or float, split a part of samples to prune the tree in order to ease the over-fitting
         :param min_samples_split: int or float. the minimum number of samples required to split
         :param min_samples_leaf: the minimum number of leaf
-        '''
+        """
         self.min_samples_split = min_samples_split
         self.criterion = eval(criterion)()
         self.max_depth = max_depth
@@ -209,10 +209,10 @@ class BaseTree(BaseEstimator):
         return combs
 
     def _predict(self, x):
-        '''
+        """
         :param x: (1, n_features)
         :return: pred (1,1)
-        '''
+        """
         p = self.root
         while not p.leaf:
             # print('feat/label %d x value %.5f split %.5f' % (p.feat_or_label, x[p.feat_or_label], p.split))

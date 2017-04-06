@@ -1,28 +1,27 @@
-from collections import Counter
+import queue
 from threading import Thread
 
 import numpy as np
-import queue
 
-from models.base_estimator import BaseEstimator
-from models.tree.cart import DecisionTreeClassifier, DecisionTreeRegressor
-from preprocessing.sampling import BootStrap
-from utils.logger import logger
-from utils.shuffle import ShuffleSpliter
+from models import BaseEstimator
+from models.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from preprocessing import BootStrap
+from utils import ShuffleSpliter
+from utils import logger
 
 Test = False
 
 class BaseForest(BaseEstimator):
     def __init__(self, criterion='gini', n_estimators=10, min_samples_splits=2, min_samples_leaf=1, max_depth=None, n_jobs=1,
                  max_features=None):
-        '''
+        """
         :param n_estimators: the number of estimators
         :param min_samples_splits:
         :param min_samples_leaf:
         :param max_depth: int or None
         :param n_jobs:
         :param max_features: int/float/str, "log2","auto","sqrt"
-        '''
+        """
         self.criterion = criterion
         self.n_estimators = n_estimators
         self.max_depth = max_depth

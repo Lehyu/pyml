@@ -1,8 +1,9 @@
 import numpy as np
 from scipy import stats
 
+
 class Imputer(object):
-    '''
+    """
     missing_values: integer, str or "nan" or list
         default: 'nan'
     usc_cols: list or "all", default("all")
@@ -10,8 +11,9 @@ class Imputer(object):
     strategy: str , default("most_frequent")
      If "mean" or "median", the replace missing values type must be integer
      If "most_frequent"
-    '''
-    def __init__(self, missing_values="nan", use_cols="all",strategy="most_frequent"):
+    """
+
+    def __init__(self, missing_values="nan", use_cols="all", strategy="most_frequent"):
         self.missing_values = missing_values
         self.use_cols = use_cols
         self.strategy = strategy
@@ -28,7 +30,6 @@ class Imputer(object):
                 val = self._median(X[:, self.use_cols[i]], self.use_cols[i], self.missing_values[i])
             self.imputer_values.append(val)
         return self
-
 
     def transform(self, X):
         for i in range(len(X)):
@@ -76,7 +77,7 @@ class Imputer(object):
         except:
             hist = dict()
             for val in array:
-                hist[val] = hist[val]+1 if val in hist else 1
+                hist[val] = hist[val] + 1 if val in hist else 1
             most = 0
             ans = None
             for key, val in hist.items():

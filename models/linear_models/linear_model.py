@@ -1,12 +1,12 @@
 import numpy as np
 
-from models.base_estimator import BaseEstimator
-from optimizer.sgd import Sgd
+from models import BaseEstimator
+from optimizer import SGD
 from utils import nutils
-from utils.logger import logger
+from utils import logger
+
 
 class LinearModel(BaseEstimator):
-
     def fit(self, X, y=None):
         self.logger.check(X, y)
         n_samples, n_features = X.shape
@@ -19,8 +19,9 @@ class LinearModel(BaseEstimator):
 
 
 class LinearRegression(LinearModel):
-    def __init__(self, learning_rate=1e-1, eps=1e-5, max_iter=1000, batch_size=10, loss="SumOfSquares", decay='step', _lambda=0.1):
-        self.optimizer = Sgd(learning_rate=learning_rate, eps=eps, max_iter=max_iter, batch_size=batch_size, loss=loss,
+    def __init__(self, learning_rate=1e-1, eps=1e-5, max_iter=1000, batch_size=10, loss="SumOfSquares", decay='step',
+                 _lambda=0.1):
+        self.optimizer = SGD(learning_rate=learning_rate, eps=eps, max_iter=max_iter, batch_size=batch_size, loss=loss,
                              decay=decay, _lambda=_lambda)
         # self.optimizer = NormalEquation()
         self.logger = logger("LinearRegression")
@@ -29,19 +30,23 @@ class LinearRegression(LinearModel):
 
     def predict(self, X):
         assert self.trained, "Please fit the model first!"
-        return (np.dot(X, self.params['coef']) +self.params['bias']).reshape((X.shape[0]))
+        return (np.dot(X, self.params['coef']) + self.params['bias']).reshape((X.shape[0]))
+
 
 class LogisticRegression(LinearModel):
-    def __init__(self, learning_rate=1e-3, eps=1e-5, max_iter=1000, batch_size=10, loss="LossWithSoftmax", decay='step', _lambda=0.1):
+    def __init__(self, learning_rate=1e-3, eps=1e-5, max_iter=1000, batch_size=10, loss="LossWithSoftmax", decay='step',
+                 _lambda=0.1):
         self.loss = loss
-        self.optimizer = Sgd(learning_rate=learning_rate, eps=eps, max_iter=max_iter, batch_size=batch_size, loss=loss, decay=decay, _lambda=_lambda)
+        self.optimizer = SGD(learning_rate=learning_rate, eps=eps, max_iter=max_iter, batch_size=batch_size, loss=loss,
+                             decay=decay, _lambda=_lambda)
         self.logger = logger("LogisticRegression")
         self.params = dict()
         self.trained = False
 
     def predict(self, X):
         if self.loss == "LossWithLogits":
-            pred = [1 if p > 0.5 else 0 for p in nutils.sigmoid(np.dot(X, self.params['coef']) +self.params['bias']).reshape((X.shape[0]))]
+            pred = [1 if p > 0.5 else 0 for p in
+                    nutils.sigmoid(np.dot(X, self.params['coef']) + self.params['bias']).reshape((X.shape[0]))]
             return np.asarray(pred)
         elif self.loss == "LossWithSoftmax":
             pred = nutils.sofmax(np.dot(X, self.params['coef']) + self.params['bias'])
@@ -55,6 +60,7 @@ if __name__ == "__main__":
     from sklearn.model_selection import train_test_split
     from utils import sklutils
     from metric import score as score
+
     '''
     mylr = LinearRegression()
     sklr = SKLR()
@@ -68,7 +74,7 @@ if __name__ == "__main__":
     '''
     mylgr = LogisticRegression(loss="LossWithLogits")
     iris = datasets.load_iris()
-    mask = np.in1d(iris.target,[0,1])
+    mask = np.in1d(iris.target, [0, 1])
     X_train, X_val, y_train, y_val = train_test_split(iris.data[mask], iris.target[mask], test_size=0.5)
     mylgr.fit(X_train, y_train)
     print(score.accuracy(mylgr.predict(X_val), y_val))

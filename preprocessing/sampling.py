@@ -2,12 +2,15 @@ import random
 import numpy as np
 
 from models.base_estimator import BaseEstimator
+
+
 class Sampling(object):
     def __init__(self):
         pass
 
     def sampling(self):
         pass
+
 
 class BootStrap(Sampling):
     def __init__(self, n_samples):

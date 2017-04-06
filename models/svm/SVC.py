@@ -2,9 +2,9 @@ import random
 
 import numpy as np
 
-from models.base_estimator import BaseEstimator
-from preprocessing.kernel import RBFKernel, PolyKernel, LinearKernel
-from utils.logger import logger
+from models import BaseEstimator
+from preprocessing import RBFKernel, PolyKernel, LinearKernel
+from utils import logger
 
 KERNEL = {'rbf': RBFKernel,
           'poly': PolyKernel,
@@ -12,6 +12,8 @@ KERNEL = {'rbf': RBFKernel,
           }
 DEFAULT_KERNEL = 'rbf'
 Test = False
+
+
 class SVC(BaseEstimator):
     def __init__(self, C=1, kernel='rbf', max_iter=10, tol=0.001, **kwargs):
         self.C = C
@@ -55,15 +57,14 @@ class SVC(BaseEstimator):
         assert self.is_trained, 'model hasn\'t been trained yet!'
         n_size, n_features = X.shape
         if n_features != self.n_features:
-            raise IndexError("X index is (-1,%d) while it prefer (-1,%d)"%(n_features, self.n_features))
+            raise IndexError("X index is (-1,%d) while it prefer (-1,%d)" % (n_features, self.n_features))
         pred = []
         for ix in range(n_size):
-            p = np.dot(self.kernel._kernel_transform(self.sv, X[ix]), self.alphas*self.y)+self.b
+            p = np.dot(self.kernel._kernel_transform(self.sv, X[ix]), self.alphas * self.y) + self.b
             pred.append(np.sign(p))
         pred = np.asarray([1 if p == 1 else 0 for p in pred])
-        pred = pred.reshape((-1,1))
+        pred = pred.reshape((-1, 1))
         return pred
-
 
     def _preprocess_y(self, y):
         n_class = len(np.unique(y))
@@ -89,15 +90,14 @@ class SVC(BaseEstimator):
                 for ix in non_bound_set:
                     alpha_changed += self._examine_at(K, y, ix)
             if Test:
-                format ='iteration %d examine at %s : %d alpha pair change!'
-                format = format%(iter_count,  'entire set' if entire_set else 'non bound set', alpha_changed)
+                format = 'iteration %d examine at %s : %d alpha pair change!'
+                format = format % (iter_count, 'entire set' if entire_set else 'non bound set', alpha_changed)
                 print(format)
             if entire_set:
                 entire_set = False
             elif alpha_changed == 0:
                 entire_set = True
             iter_count += 1
-
 
     def _examine_at(self, K, y, ix2):
         a2 = self.alphas[ix2]
@@ -134,36 +134,42 @@ class SVC(BaseEstimator):
         return 0
 
     def _take_step(self, K, y, ix1, ix2, e1, e2):
-        K11 = K[ix1, ix1]; K12 = K[ix1, ix2]; K22 = K[ix1, ix2]
-        y1 = y[ix1]; y2 = y[ix2]; s = y1*y2
+        K11 = K[ix1, ix1];
+        K12 = K[ix1, ix2];
+        K22 = K[ix1, ix2]
+        y1 = y[ix1];
+        y2 = y[ix2];
+        s = y1 * y2
         a1 = np.copy(self.alphas[ix1])
         a2 = np.copy(self.alphas[ix2])
         # I don't have a clear idea why L H selected. todo
         if s == 1:
-            L = max(0, a1+a2-self.C); H = min(self.C, a1+a2)
+            L = max(0, a1 + a2 - self.C);
+            H = min(self.C, a1 + a2)
         else:
-            L = max(0, a2-a1); H = min(self.C, self.C+a2-a1)
+            L = max(0, a2 - a1);
+            H = min(self.C, self.C + a2 - a1)
         if L == H: return False
-        eta = K11 + K22 - 2*K12
+        eta = K11 + K22 - 2 * K12
         if eta <= 0: return False
         '''
         this is derive from the L(alpha), replace a1 and eliminate y1
         vi = f(xi) - sum(aj*yj*K(xi,xj)) i =1,2; j=3,....
         L(alpha) = L(a1, a2) = K11*a1**2/2+K22*a2**2/2+y1*y2*K12*a1*a2-(a1+a2)+y1*v1*a1+y2*v2*a2
         '''
-        alpha2 = a2 + y2*(e1-e2)/eta
+        alpha2 = a2 + y2 * (e1 - e2) / eta
         alpha2 = self._clip_alpha(alpha2, L, H)
-        alpha1 = a1 + s*(a2 - alpha2) # sum(ai*yi) = 0
+        alpha1 = a1 + s * (a2 - alpha2)  # sum(ai*yi) = 0
         self.alphas[ix1] = alpha1
         self.alphas[ix2] = alpha2
-        b1 = self.b - e1 - y1*K11*(alpha1 - a1) - y2*K12*(alpha2 - a2)
-        b2 = self.b - e2 - y1*K12*(alpha1 - a1) - y2*K22*(alpha2 - a2)
+        b1 = self.b - e1 - y1 * K11 * (alpha1 - a1) - y2 * K12 * (alpha2 - a2)
+        b2 = self.b - e2 - y1 * K12 * (alpha1 - a1) - y2 * K22 * (alpha2 - a2)
         if 0 < alpha2 < self.C:
             self.b = b2
         elif 0 < alpha1 < self.C:
             self.b = b1
         else:
-            self.b = (b1+b2)/2.0
+            self.b = (b1 + b2) / 2.0
 
         # it's not clear how to update e_cache uing only support vector or the whole dataset
         self._update_e(K, y, ix1)
@@ -177,13 +183,14 @@ class SVC(BaseEstimator):
             return H
         else:
             return alpha
+
     def _calc_e(self, K, y, ix):
         yi = y[ix]
         '''
         ei = fi-yi and fi = sum(aj*tj*K(xi,xj))+b
         '''
-        fi = np.dot(K[ix], self.alphas*y)+self.b
-        return float(fi-yi)
+        fi = np.dot(K[ix], self.alphas * y) + self.b
+        return float(fi - yi)
 
     def _update_e(self, K, y, ix):
         ei = self._calc_e(K, y, ix)
@@ -209,4 +216,3 @@ class SVC(BaseEstimator):
                 ix1 = int(random.uniform(0, len(y)))
             eix1 = self._calc_e(K, y, ix1)
         return ix1, eix1
-
