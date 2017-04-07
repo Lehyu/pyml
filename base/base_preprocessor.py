@@ -1,4 +1,4 @@
-from models.base_estimator import BaseEstimator
+from base.base_estimator import BaseEstimator
 
 
 class BasePreprocessor(BaseEstimator):

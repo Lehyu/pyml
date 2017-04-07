@@ -33,6 +33,12 @@ Try to implement algorithms of machine learning which I known and used. These im
 
 [2017.03.28] Finished SGD for LR, there are maybe some bug when apply other learner. Remain to test. 
 
+# Model Selection
+[2017.04.05] split. p_train_test_split: split train and test dataset according to condition, input should be pandas.DataFrame.
+
+[2017.04.07] search. GridSearchCV: use greedy strategy to search the params_grid; FullSearchCV: search params_grid on the whole parameter space.
+ 
+
 # Decomposition
 
 ## PCA
