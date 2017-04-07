@@ -3,8 +3,10 @@ from threading import Thread
 
 import numpy as np
 
-from models import BaseEstimator
-from models.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from base import BaseEstimator
+from models.tree.cart import DecisionTreeClassifier
+from models.tree.cart import DecisionTreeRegressor
+
 from preprocessing import BootStrap
 from utils import ShuffleSpliter
 from utils import logger

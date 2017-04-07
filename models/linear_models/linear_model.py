@@ -1,9 +1,8 @@
 import numpy as np
 
-from models import BaseEstimator
+from base import BaseEstimator
 from optimizer import SGD
-from utils import nutils
-from utils import logger
+from utils import logger, nutils
 
 
 class LinearModel(BaseEstimator):

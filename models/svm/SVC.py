@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from models import BaseEstimator
+from base import BaseEstimator
 from preprocessing import RBFKernel, PolyKernel, LinearKernel
 from utils import logger
 

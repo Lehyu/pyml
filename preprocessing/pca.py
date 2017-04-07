@@ -2,7 +2,7 @@ import numpy as np
 from scipy import linalg
 from sklearn.decomposition import PCA as skPCA
 
-from models.base_estimator import BaseEstimator
+from base import BaseEstimator
 
 
 class PCA(BaseEstimator):

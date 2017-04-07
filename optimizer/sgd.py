@@ -1,8 +1,7 @@
-import numpy as np
 import sys
 
-from optimizer.base_optimizer import BaseOptimizer
-from optimizer.loss import LossWithSumOfSquare, LossWithLogits, LossWithSoftmax
+from base import BaseOptimizer
+from .loss import LossWithSumOfSquare, LossWithLogits, LossWithSoftmax
 from utils import nutils
 
 LOSS = {'SumOfSquares': LossWithSumOfSquare,

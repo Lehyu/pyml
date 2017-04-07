@@ -4,8 +4,8 @@ import operator
 import numpy as np
 
 from metric.info_criterion import gini, mape, mse
-from models import BaseEstimator
-from models.tree import SplitInfo
+from base import BaseEstimator
+from base import SplitInfo
 from utils import nutils
 from utils import logger
 from utils import ShuffleSpliter

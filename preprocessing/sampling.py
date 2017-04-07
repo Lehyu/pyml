@@ -1,7 +1,4 @@
 import random
-import numpy as np
-
-from models.base_estimator import BaseEstimator
 
 
 class Sampling(object):

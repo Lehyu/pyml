@@ -1,5 +1,4 @@
 import numpy as np
-import sys
 
 
 def precision(PredictSet, ReferenceSet):

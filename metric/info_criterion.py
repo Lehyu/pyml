@@ -4,8 +4,8 @@ from collections import Counter
 
 import numpy as np
 
-from metric import MAPE
-from models.tree import SplitInfo
+from base import SplitInfo
+from metric.score import MAPE
 from utils import nutils
 
 

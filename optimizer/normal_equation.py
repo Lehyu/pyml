@@ -1,6 +1,6 @@
 import numpy as np
 
-from optimizer.base_optimizer import BaseOptimizer
+from base import BaseOptimizer
 
 
 class NormalEquation(BaseOptimizer):

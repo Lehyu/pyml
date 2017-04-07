@@ -1,5 +1,5 @@
-from preprocessing.base_preprocessor import BasePreprocessor
-from utils.logger import logger
+from base import BasePreprocessor
+from utils import logger
 
 
 class MinMaxScaler(BasePreprocessor):

@@ -2,8 +2,8 @@ import pandas as pd
 import datetime
 
 
-def load_data(path, cols=[], date_format='%Y-%m-%d %H'):
-    if len(cols) != 0:
+def load_data(path, cols=None, date_format='%Y-%m-%d %H'):
+    if cols is not None:
         data = pd.read_csv(path, parse_dates=cols, date_parser=lambda dates: pd.datetime.strptime(dates, date_format))
     else:
         data = pd.read_csv(path)

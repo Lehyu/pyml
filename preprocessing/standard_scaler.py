@@ -1,5 +1,6 @@
 import numpy as np
-from preprocessing.base_preprocessor import BasePreprocessor
+
+from base import BasePreprocessor
 
 '''
 For instance many elements used in the objective function of a learning algorithm
