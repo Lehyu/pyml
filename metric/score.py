@@ -19,7 +19,7 @@ def F1(Precision, Recall):
 
 
 def mse(y, y_pred):
-    return np.sqrt(np.sum((y - y_pred) ** 2))
+    return np.mean(np.sqrt((y-y_pred)**2))
 
 
 def accuracy(y, y_pred):
