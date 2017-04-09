@@ -16,7 +16,8 @@ def F1(Precision, Recall):
         return 2.0 * Precision * Recall / (Precision + Recall)
     else:
         raise ValueError("Precision's type is %s while recall's type is %s" % (type(Precision), type(Recall)))
-
+def rmse(y, y_pred):
+    return np.sqrt(np.mean((y-y_pred)**2))
 
 def mse(y, y_pred):
     return np.mean(np.sqrt((y-y_pred)**2))
@@ -35,4 +36,4 @@ def metric(y, y_pred):
 
 # TianChi KDD task 2 evaluation metric
 def MAPE(y, y_pred):
-    return np.mean(np.abs(y_pred - y) / y)
+    return np.mean(np.abs((y_pred - y) / y))

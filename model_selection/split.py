@@ -6,7 +6,7 @@ __all__ = ()
 class CVSpliter(object):
     def __init__(self, n_samples, cv):
         self.cv = cv
-        self.spliter = ShuffleSpliter(n_samples=n_samples, test_size=self.cv)
+        self.spliter = ShuffleSpliter(n_samples=n_samples, test_size=1.0/self.cv)
 
     def split(self):
         for i in range(self.cv):

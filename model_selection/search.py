@@ -1,4 +1,5 @@
 import itertools
+from collections import defaultdict
 
 from base import BaseEstimator
 from model_selection.split import CVSpliter
@@ -42,14 +43,22 @@ class BaseSearchCV(BaseEstimator):
             y_val = self.post_operator.post_process(y_val, addition_y)
         elif self.post_operator is not None and addition_y is None:
             raise ValueError("addition_y should not be None!")
+        #print(y_pred-y_val)
         score = self.scorer.score(y_val, y_pred)
+        assert score >= self.scorer.tol, "score(%5.f) should be greater than %.5f. " \
+                                         "please check out the features that feed in!"%(score, self.scorer.tol)
         return score
 
     def _scoreCV(self, model, X_train, y_train, addition_y):
         cvspliter = CVSpliter(X_train.shape[0], self.cv)
         score = 0.0
+        cv = 5
         for train_ix, val_ix in cvspliter.split():
-            score += self._score(model, X_train[train_ix], y_train[train_ix], X_train[val_ix], y_train[val_ix], addition_y)
+            s = self._score(model, X_train[train_ix], y_train[train_ix], X_train[val_ix], y_train[val_ix], addition_y=addition_y[val_ix])
+            if self.verbose:
+                print("CV%d....... score%.5f"%(cv, s))
+            cv+=1
+            score += s
         score /= self.cv
         return score
 
@@ -77,16 +86,27 @@ class SingleModelSearchCV(BaseSearchCV):
         self.post_operator = post_operator
         self.cv = cv
         self.verbose = verbose
-        self.scores = dict()
+        self.scores = defaultdict()
         self.best_score_ = self.scorer.worst
 
     def _fit(self, X_train, y_train=None, X_val=None, y_val=None, addition_y=None):
-        for estimator in self.estimators:
-            print(estimator.__class__.__name__)
-            _, score = self._check(estimator, X_train, y_train, X_val, y_val)
-            self.scores[estimator.__class__.__name__] = score
-            if self.verbose:
-                print("estimator %s score %.5f"%(estimator.__class__.__name__, score))
+        cvspliter = CVSpliter(X_train.shape[0], self.cv)
+        cv = 1
+        for train_ix, val_ix in cvspliter.split():
+            for _id, estimator in enumerate(self.estimators):
+                score = self._score(estimator, X_train[train_ix], y_train[train_ix], X_train[val_ix], y_train[val_ix], addition_y=addition_y[val_ix])
+                key = str(_id)+'._'+estimator.__class__.__name__
+                if key in self.scores:
+                    self.scores[key] += score
+                else:
+                    self.scores[key] = score
+                if self.verbose:
+                    print("CV%d......estimator:%s.....score:%.5f"%(cv, key, score))
+            cv += 1
+        for key in self.scores.keys():
+            self.scores[key]/=self.cv
+
+
 
     def get_scores(self):
         return self.scores
@@ -114,5 +134,4 @@ class FullSearchCV(BaseSearchCV):
         for vals in itertools.product(*self.params_grid.values()):
             _params = dict(zip(keys, vals))
             model = self.estimator()
-            model.set_params(**_params)
             self._update(_params, model, X_train, y_train, X_val, y_val, addition_y)

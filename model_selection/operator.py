@@ -2,9 +2,10 @@ import sys
 
 
 class scorer(object):
-    def __init__(self, scoring, greater_is_better=True):
+    def __init__(self, scoring, tol, greater_is_better=True):
         self._scorer = scoring
         self.greater_is_better = greater_is_better
+        self.tol = tol
         if self.greater_is_better:
             self.worst = -10
         else:
@@ -34,5 +35,5 @@ def make_post_operator(operator):
     return post_operator(operator)
 
 
-def make_scorer(scoring, greater_is_better=True):
-    return scorer(scoring, greater_is_better)
+def make_scorer(scoring, tol, greater_is_better=True):
+    return scorer(scoring, tol, greater_is_better)
