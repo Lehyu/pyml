@@ -23,6 +23,8 @@ Try to implement algorithms of machine learning which I known and used. These im
 [2017.03.23] ~~I haven't finished the pruning code yet.~~  
 [2017.03.24] Finished the pruning code. but it seems quiet sucks on diabetes data set(sklearn). Maybe some part went wrong, still haven't no idea
 
+## RandomForestRegression
+[2017.03.27] Finished, there is the same issue as RandomForestClassifier
 ## LinearRegression
 
 [2017.03.28] Finished LR, it has comparable result on diabetes data set with LR in sklearn.
