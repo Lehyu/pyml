@@ -4,20 +4,17 @@ from base import BaseOptimizer
 from .loss import LossWithSumOfSquare, LossWithLogits, LossWithSoftmax
 from utils import nutils
 
-LOSS = {'SumOfSquares': LossWithSumOfSquare,
-        'LossWithLogits': LossWithLogits,
-        'LossWithSoftmax': LossWithSoftmax}
+
 Test = False
 
 
 class SGD(BaseOptimizer):
-    def __init__(self, learning_rate=1e-1, eps=1e-5, max_iter=100000, batch_size=10, loss="SumOfSquares", decay='step',
-                 _lambda=0.1):
+    def __init__(self, learning_rate=1e-1, eps=1e-5, max_iter=100000, batch_size=10, loss="SumOfSquares", decay='step'):
         self.learning_rate = learning_rate
         self.eps = eps
         self.max_iter = max_iter
         self.batch_size = batch_size
-        self._loss = LOSS[loss](_lambda)
+        self._loss = loss
 
     def solve(self, X, y, params):
         """

@@ -52,3 +52,6 @@ def sigmoid(a):
 def sofmax(a):
     tmp = np.exp(a)
     return tmp / np.sum(tmp, axis=1).reshape((-1,1))
+
+def corr(X, y):
+    return np.dot(y, X)/np.sqrt(np.dot(y**2, X**2))

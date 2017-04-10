@@ -6,13 +6,13 @@ Try to implement algorithms of machine learning which I known and used. These im
 
 ## DecisionTreeClassifier
 
-[2017.03.23] I haven't finished the pruning code yet.  
+[2017.03.23] ~~I haven't finished the pruning code yet.~~  
 [2017.03.24] Finished the pruning code, it seems works quiet well on iris data set(sklearn)
 [2017.03.27] Found a new issue of **min_samples_split** when I wrote the RandomForestClassifier code. I didn't handle this parameter for now.
 
 ## LogisticRegression
-[2017.03.29] Finished. support multi-class and of course binary classification. 
-
+[2017.03.29] Finished. support multi-class and of course binary classification.
+ 
 ## RandomForestClassifier
 
 [2017.03.27] Finished, it seems work well on iris data set while on digits is quiet bad. 
@@ -20,12 +20,20 @@ Try to implement algorithms of machine learning which I known and used. These im
 # Regressor
 
 ## DecisionTreeRegressor
-[2017.03.23] I haven't finished the pruning code yet.  
+[2017.03.23] ~~I haven't finished the pruning code yet.~~  
 [2017.03.24] Finished the pruning code. but it seems quiet sucks on diabetes data set(sklearn). Maybe some part went wrong, still haven't no idea
 
 ## LinearRegression
 
 [2017.03.28] Finished LR, it has comparable result on diabetes data set with LR in sklearn.
+
+## Ridge
+
+[2017.04.10] Base on the customs and usages, split Ridge from LinearRegressor
+
+## Lasso
+
+[2017.04.10] complete the forward selection optimizer. todo LARS and forward stagewise
 
 # Optimizer
 

@@ -14,8 +14,9 @@ class Loss(object):
 
 
 class LossWithSumOfSquare(Loss):
-    def __init__(self, _lambda):
+    def __init__(self, _lambda, normalizer):
         self._lambda = _lambda
+        self._normalizer = normalizer
 
     def feval(self, X, y, params):
         """
@@ -31,12 +32,14 @@ class LossWithSumOfSquare(Loss):
             "X shape %s y shape %s params['coef'] shape %s" % (X.shape, y.shape, params['coef'].shape)
         '''
         n_samples, n_features = X.shape
-        n_classes = y.shape[1]
         t = np.dot(X, params['coef']) + params['bias']
         res = y - t
-        loss = (np.sum(res ** 2) / n_samples + self._lambda * np.sum(params['coef'] ** 2)) / 2.0
-        coef_grad = (-np.dot(X.T, res) + self._lambda * params['coef'])
-        bias_grad = (-np.sum(res))
+        penalty, params_grad = self._normalizer.feval(params['coef'])
+        #loss = (np.sum(res ** 2) / n_samples + self._lambda * np.sum(params['coef'] ** 2)) / 2.0
+        loss = (np.sum(res ** 2) / n_samples + self._lambda*penalty) / 2.0
+        #coef_grad = (-np.dot(X.T, res) + self._lambda * params['coef'])
+        coef_grad = -np.dot(X.T, res) + params_grad*self._lambda
+        bias_grad = -np.sum(res)
         return loss, coef_grad, bias_grad
 
 
