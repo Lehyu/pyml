@@ -55,7 +55,7 @@ class BaseSearchCV(BaseEstimator):
         cv = 5
         for train_ix, val_ix in cvspliter.split():
             s = self._score(model, X_train[train_ix], y_train[train_ix], X_train[val_ix], y_train[val_ix], addition_y=addition_y[val_ix])
-            if self.verbose:
+            if self.verbose and self.__class__.__name__ == "SingleModelSearchCV":
                 print("CV%d....... score%.5f"%(cv, s))
             cv+=1
             score += s
