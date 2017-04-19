@@ -23,8 +23,10 @@ def hist(data, col1, col2):
     plt.show()
 
 
-def heatmap(data, key, k):
+def heatmap(data, key, k, abs=False):
     corrmat = data.corr()
+    if abs:
+        corrmat = np.abs(corrmat)
     cols = corrmat.nlargest(k, key)[key].index
     cm = np.corrcoef(data[cols].values.T)
     sns.set(font_scale=2.25)

@@ -1,5 +1,5 @@
 from .split import p_train_test_split
-from .split import CVSpliter
+from .split import RandomSpliter
 
 from .search import GridSearchCV
 from .search import FullSearchCV

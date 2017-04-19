@@ -103,10 +103,10 @@ class SVC(BaseEstimator):
         a2 = self.alphas[ix2]
         r2 = y[ix2] * self.ecache[ix2]
         '''
-        KKT: 1) a = 0     and ty >= 1
-             2) 0 < a < C and ty = 1
-             3) a = C     and ty <= 1
-        find alphas[ix] which violate KKT: r2 = ty-1, r2 < 0 ,r2 = 0 or r2 > 0
+        KKT: 1) a = 0     and t*y >= 1
+             2) 0 < a < C and t*y = 1
+             3) a = C     and t*y <= 1
+        find alphas[ix] which violate KKT: r2 = t*y-1, r2 < 0 ,r2 = 0 or r2 > 0
              1) r2 < 0 if a < C, violate
              2) r2 = 0 , none
              3) r2 > 0 if a > 0, violate
