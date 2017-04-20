@@ -21,6 +21,7 @@ class ShuffleSpliter(object):
             self.test_size = test_size
         self.test_size = int(np.floor(self.test_size))
 
+
     def shuffle(self):
         """
         :return: train indexes and test indexes

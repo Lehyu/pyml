@@ -37,6 +37,12 @@ Try to implement algorithms of machine learning which I known and used. These im
 
 [2017.04.10] complete the forward selection optimizer. todo LARS and forward stagewise
 
+# Cluster
+
+## K-means
+
+[2017-04-20] a rough K-means.
+
 # Optimizer
 
 ## Stochastic Gradient Descent
