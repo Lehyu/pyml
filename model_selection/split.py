@@ -5,7 +5,7 @@ __all__ = ()
 
 class Spliter(object):
     def __init__(self, n_samples, cv=3, pre_split=False):
-        self.cv = cv
+        self._cv = cv
         self.pre_split = pre_split
         self.spliter = ShuffleSpliter(n_samples=n_samples, test_size=1.0 / self.cv)
 
@@ -15,6 +15,10 @@ class Spliter(object):
         else:
             for ix in self.cv_ixes_:
                 yield ix
+
+    @property
+    def cv(self):
+        return self._cv
 
     def _split_real_time(self):
         for i in range(self.cv):
@@ -32,7 +36,6 @@ class RandomSpliter(Spliter):
         self.spliter = ShuffleSpliter(n_samples=n_samples, test_size=1.0 / self.cv)
         if self.pre_split:
             self._split_before_hand()
-
 
 def p_train_test_split(data, condition):
     """

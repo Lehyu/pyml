@@ -62,6 +62,8 @@ Try to implement algorithms of machine learning which I known and used. These im
 [2017.04.07] GridSearchCV: use greedy strategy to search the params_grid; FullSearchCV: search params_grid on the whole parameter space.
 
 [2017.04.08] SingleModelSearchCV: compare model with their default setting, or you can set the parameters beforehand.
+
+[2017.04.20] add thread support
  
 
 # Decomposition

@@ -18,7 +18,7 @@ class Cluster(object):
 
 
 class Kmeans(BaseEstimator):
-    def __init__(self, k, tol=0.001):
+    def __init__(self, k, tol=1e-5):
         self.dist = Dist(criterion="Euclidean")
         self.k = k
         self.clusters = None
@@ -82,10 +82,9 @@ if __name__ == "__main__":
     from metric import score as score
     iris = datasets.load_iris()
     X, y = iris.data, iris.target
-    mask = np.in1d(y, [0, 1])
-    X_train, X_val, y_train, y_val = train_test_split(X[mask], y[mask], test_size=0.5, random_state=5)
-    kmeans = Kmeans(2)
-    kmeans.fit(X_train, y_train)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.5, random_state=5)
+    kmeans = Kmeans(3)
+    kmeans.fit(X_train)
     y_pred = kmeans.predict(X_val)
     #y_pred = 1-y_pred
     print(y_pred)
