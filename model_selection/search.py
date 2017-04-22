@@ -10,6 +10,7 @@ import time
 
 from base import BaseEstimator
 from model_selection.split import RandomSpliter
+from utils import safeutils
 
 
 class BaseSearchCV(BaseEstimator):
@@ -189,7 +190,6 @@ class GridSearchCV(BaseSearchCV):
                     tmp_params_grid_[key] = [self.best_params_[key]]
             keys = tmp_params_grid_.keys()
             params_combs = list(itertools.product(*(tmp_params_grid_.values())))
-            params_num = len(params_combs)
             t_params_producer = Thread(target=self._params_producer, args=(params_combs, keys))
             t_params_producer.daemon = True
             threads = [t_params_producer]
@@ -210,6 +210,7 @@ class FullSearchCV(BaseSearchCV):
         super().__init__(estimator, params_grid, scorer, post_operator, cv_spliter, n_jobs, verbose)
 
     def _fit(self, X_train, y_train=None, X_val=None, y_val=None, addition_y=None):
+        safeutils.apply_sklearn_workaround()
         model = self.estimator()
         keys = self.params_grid.keys()
         _params = dict()
