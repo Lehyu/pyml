@@ -15,6 +15,7 @@ class SelectFromModel(BaseEstimator):
         self.best_cols_ = []
         self.size_ = size
 
+
     def fit(self, X, y=None):
         if not self.prefit:
             self.estimator.fit(X, y)
@@ -34,6 +35,7 @@ class FFS(object):
         self.scorer = scorer
         self.n_features_to_select = n_features_to_select
         self.best_cols_ = dict()
+        self.best_score_ = None
         self.record_cols_ = dict()
         self.cols_queue = Queue(maxsize=500)
         self.produced = False
@@ -98,7 +100,8 @@ class FFS(object):
             print(iter)
         scores_ = sorted(self.best_cols_.items(), key=lambda item: item[1], reverse=reverse)
         self.best_cols_.clear()
-        self.best_cols_[scores_[0][0]] = scores_[0][1]
+        self.best_cols_= scores_[0][0]
+        self.best_score_ = scores_[0][1]
 
 
 
