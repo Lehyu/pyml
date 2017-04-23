@@ -75,7 +75,7 @@ class FFS(object):
         wholeset = set(range(tX.shape[1]))
         safeutils.apply_sklearn_workaround()
         reverse = self.scorer.greater_is_better
-        while iter <= self.n_features_to_select:
+        while iter < self.n_features_to_select:
             remainset = wholeset - curset
             t_params_producer = Thread(target=self._producer, args=(curset, remainset))
             t_params_producer.daemon = True
