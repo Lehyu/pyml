@@ -100,7 +100,7 @@ class FFS(object):
             print(iter)
         scores_ = sorted(self.best_cols_.items(), key=lambda item: item[1], reverse=reverse)
         self.best_cols_.clear()
-        self.best_cols_= scores_[0][0]
+        self.best_cols_= list(scores_[0][0])
         self.best_score_ = scores_[0][1]
 
 
