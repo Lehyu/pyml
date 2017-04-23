@@ -64,6 +64,10 @@ Try to implement algorithms of machine learning which I known and used. These im
 [2017.04.08] SingleModelSearchCV: compare model with their default setting, or you can set the parameters beforehand.
 
 [2017.04.20] add thread support
+
+# Feature Selection
+
+[2017.04.20] Forward Feature Selection
  
 
 # Decomposition
