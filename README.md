@@ -68,6 +68,8 @@ Try to implement algorithms of machine learning which I known and used. These im
 # Feature Selection
 
 [2017.04.20] Forward Feature Selection
+
+[2017.04.24] Las Vagas Wrapper.
  
 
 # Decomposition

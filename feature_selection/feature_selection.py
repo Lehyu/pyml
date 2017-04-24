@@ -1,4 +1,5 @@
 import threading
+import random
 from queue import Queue
 from threading import Thread
 
@@ -102,6 +103,38 @@ class FFS(object):
         self.best_cols_.clear()
         self.best_cols_= list(scores_[0][0])
         self.best_score_ = scores_[0][1]
+
+class LVW(object):
+    def __init__(self, estimator, scorer):
+        self.estimator = estimator
+        self.scorer = scorer
+        self.best_score_ = None
+        self.best_cols_ = None
+
+    def fit(self, tX, ty, vX, vy, T,original_features):
+        E = self.scorer.worst
+        A = list(set(range(tX.shape[1]))-set(original_features))
+        t = 0
+        d = len(original_features)
+        while t < T:
+            selected_features = list(set(random.sample(A, random.randint(1, len(A)))) | set(original_features))
+            d_ = len(selected_features)
+            model = self.estimator()
+            model.fit(tX[:, selected_features], ty)
+            py = model.predict(vX[:, selected_features])
+            E_ = self.scorer.score(vy, py)
+            if self.scorer.better(E_, E) or (E_ == E and d_ < d):
+                t = 0
+                E = E_
+                d = d_
+                self.best_cols_ = selected_features
+                self.best_score_ = E_
+            else:
+                t += 1
+
+
+
+
 
 
 
