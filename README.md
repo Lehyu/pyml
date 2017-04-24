@@ -43,6 +43,8 @@ Try to implement algorithms of machine learning which I known and used. These im
 
 [2017-04-20] a rough K-means.
 
+[2017.04.24] a rough learning vector quantization.
+
 # Optimizer
 
 ## Stochastic Gradient Descent
