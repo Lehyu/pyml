@@ -15,7 +15,10 @@ Try to implement algorithms of machine learning which I known and used. These im
  
 ## RandomForestClassifier
 
-[2017.03.27] Finished, it seems work well on iris data set while on digits is quiet bad. 
+[2017.03.27] Finished, it seems work well on iris data set while on digits is quiet bad.
+ 
+ ## AdaBoostClassifier
+ [2017.04.25] Finished
 
 # Regressor
 
