@@ -164,9 +164,9 @@ class SingleModelSearchCV(BaseSearchCV):
 
 
 class GridSearchCV(BaseSearchCV):
-    def __init__(self, estimator, params_grid, scorer, proba=False, params_seq=None, cv_spliter=None, verbose=False):
+    def __init__(self, estimator, params_grid, scorer, proba=False, params_seq=None, cv_spliter=None, verbose=False, n_jobs=1):
         super(GridSearchCV, self).__init__(estimator=estimator, params_grid=params_grid, scorer=scorer, proba=proba,
-                                          cv_spliter=cv_spliter, verbose=verbose)
+                                          cv_spliter=cv_spliter, verbose=verbose, n_jobs=n_jobs)
         self.params_seq = params_seq
         if self.params_seq is None:
             self.params_seq = list(self.params_grid.keys())
