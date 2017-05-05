@@ -16,7 +16,7 @@ class AdaBoostClassifier(AdaBoost):
     def __init__(self, n_estimators=10, base_estimator=DecisionTreeClassifier, epsilon=1e-10):
         self.n_estimators = n_estimators
         self.base_estimator = base_estimator
-        self.estimators = [self.base_estimator() for i in range(self.n_estimators)]
+        self.estimators = []
         self.alphas = []
         self.logger = logger("AdaboostClassifier")
         self.epsilon = epsilon
@@ -60,8 +60,10 @@ class AdaBoostClassifier(AdaBoost):
                 sample_ix = np.random.choice(range(n_samples), n_samples, True, weights)
 
             ## train model
-            self.estimators[t].fit(X[sample_ix], y[sample_ix])
-            py = self.estimators[t].predict(X)
+            model = self.base_estimator()
+            model.fit(X[sample_ix], y[sample_ix])
+            py = model.predict(X)
+            #hits = np.asarray([1 if t != p else 0 for t, p in zip(y[sample_ix], self.estimators[t].predict(X[sample_ix]))])
             hits = np.asarray([1 if t != p else 0 for t, p in zip(y, py)])
             error = np.dot(hits, weights)
             if error > 0.5:
@@ -71,7 +73,7 @@ class AdaBoostClassifier(AdaBoost):
             #alphas_.append(np.log((1 - error) / (error)) / 2.0)
             ## adding epsilon to keep stability in case of strong classifier
             alphas_.append(np.log((1 - error+self.epsilon) / (error+self.epsilon)) / 2.0)
-
+            self.estimators.append(model)
             ## update samples' weight
             weights = self._update_weights(weights, alphas_[t], y, py)
         self.alphas = np.asarray(alphas_)
@@ -91,15 +93,21 @@ if __name__ == "__main__":
     from sklearn import datasets
     from sklearn.model_selection import train_test_split
     from metric import score as score
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.ensemble import AdaBoostClassifier as SKAdaBoostClassifier
+    from sklearn.neighbors import KNeighborsClassifier
 
     iris = datasets.load_iris()
     X, y = iris.data, iris.target
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.5, random_state=5)
-    adabc = AdaBoostClassifier()
+    skada = SKAdaBoostClassifier(n_estimators=10)
+    skada.fit(X_train, y_train)
+    print("DecisionTreeClassifier %.5f" % score.accuracy(skada.predict(X_val), y_val))
+    adabc = AdaBoostClassifier(n_estimators=10)
     adabc.fit(X_train, y_train)
 
     y_pred = adabc.predict(X_val)
     # y_pred = 1-y_pred
     print(y_pred)
     print(y_val)
-    print("kmeans %.5f" % score.accuracy(y_pred, y_val))
+    print("AdaBoostClassifier %.5f" % score.accuracy(y_pred, y_val))

@@ -17,9 +17,12 @@ def relationship(data_df, col1, col2, plot='boxplot'):
     plt.show()
 
 
-def hist(data, col1, col2):
+
+def hist(data, col1, col2, relative=True):
     df = pd.crosstab(data[col1], data[col2])
-    df.plot(kind='bar')
+    if relative:
+        df /= df.sum()
+    df.plot(kind='barh',sharey=False, sharex=False)
     plt.show()
 
 

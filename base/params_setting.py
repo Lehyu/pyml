@@ -25,18 +25,18 @@ xgb_params_grid = {
     'n_estimators': [120, 300, 500, 800, 1200, 2000, 3000]
 }
 
-gdbt_params_grid= {
+gbdt_params_grid= {
     'learning_rate': [0.01, 0.015, 0.025, 0.05, 0.1],
     'n_estimators': [120, 300, 500, 800, 1200, 2000, 3000],
     'max_depth': [3, 5, 7, 9, 12, 15, 17, 25],
-    'min_samples_split':[2, 5, 10, 15, 100],
+    'min_samples_split': [2, 5, 10, 15],
     'min_samples_leaf': [1, 2, 5, 10],
-    'max_features': [0.3,0.4,0.5,'log2', 'sqrt', 'auto'],
+    'max_features': ['log2', 'sqrt', 'auto'],
     'subsample': [0.6, 0.7, 0.8, 0.9 ,1.0]
 }
-gdbt_grid_search_params_seq = {
-
-}
+gbdt_grid_search_params_seq = [
+('max_depth', 'min_samples_split'), ('min_samples_leaf', ), ('max_features', 'subsample'), ('n_estimators', 'learning_rate')
+]
 xgb_grid_search_params_seq = [ ('max_depth', 'min_child_weight'), ('gamma',), ('subsample', 'colsample_bytree'),
-                               ('reg_alpha', 'reg_lambda'), ('learning_rate',),  ('n_estimators',) ]
+                               ('reg_alpha', 'reg_lambda'), ('learning_rate', 'n_estimators') ]
 forest_grid_search_params_seq = [('max_depth', 'min_samples_split'), ('min_samples_leaf', ), ('max_features',), ('n_estimators', )]
