@@ -134,11 +134,11 @@ class SVC(BaseEstimator):
         return 0
 
     def _take_step(self, K, y, ix1, ix2, e1, e2):
-        K11 = K[ix1, ix1];
-        K12 = K[ix1, ix2];
+        K11 = K[ix1, ix1]
+        K12 = K[ix1, ix2]
         K22 = K[ix1, ix2]
-        y1 = y[ix1];
-        y2 = y[ix2];
+        y1 = y[ix1]
+        y2 = y[ix2]
         s = y1 * y2
         a1 = np.copy(self.alphas[ix1])
         a2 = np.copy(self.alphas[ix2])

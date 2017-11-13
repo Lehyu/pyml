@@ -12,7 +12,14 @@ ridge_params_grid = {
     "fit_intercept": [False, True],
     "normalize": [True, False]
 }
-ridge_grid_params_seq = [("alpha",),("fit_intercept",),("normalize",)]
+
+linear_svr_params_grid = {
+    'C':  {0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 10, 100},
+    'loss': {'epsilon_insensitive',  'squared_epsilon_insensitive'},
+    'epsilon': {0.1, 0.5, 0, 1},
+    'max_iter': {100, 500, 1000, 3000, 5000}
+}
+
 xgb_params_grid = {
     'learning_rate': [0.01, 0.015, 0.025, 0.05, 0.1],
     'gamma': [0, 0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 1.0],
@@ -37,6 +44,8 @@ gbdt_params_grid= {
 gbdt_grid_search_params_seq = [
 ('max_depth', 'min_samples_split'), ('min_samples_leaf', ), ('max_features', 'subsample'), ('n_estimators', 'learning_rate')
 ]
+ridge_grid_search_params_seq = [("alpha", "fit_intercept", "normalize",)]
+linear_svr_search_params_seq = [("C", "loss", "epsilon", "max_iter")]
 xgb_grid_search_params_seq = [ ('max_depth', 'min_child_weight'), ('gamma',), ('subsample', 'colsample_bytree'),
                                ('reg_alpha', 'reg_lambda'), ('learning_rate', 'n_estimators') ]
 forest_grid_search_params_seq = [('max_depth', 'min_samples_split'), ('min_samples_leaf', ), ('max_features',), ('n_estimators', )]

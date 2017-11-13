@@ -9,7 +9,6 @@ from collections import defaultdict
 import time
 
 from base import BaseEstimator
-from model_selection.split import RandomSpliter
 from utils import safeutils
 
 
